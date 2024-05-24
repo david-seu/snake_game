@@ -8,9 +8,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 @Stateless
-public class UserDao extends GenericDao<User> implements IUserDao {
+public class UserDao extends GenericDao implements IUserDao {
     public UserDao() {
-        super(User.class);
+        super();
     }
 
     public User findByUsername(String username) {
@@ -26,5 +26,22 @@ public class UserDao extends GenericDao<User> implements IUserDao {
             e.printStackTrace();
         }
         return u;
+    }
+
+    public void update(User user) {
+        try {
+            stmt.executeUpdate("UPDATE users SET score = " + user.getScore() + ", time_spent = " + user.getTimeSpent() + " WHERE id = " + user.getId());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void save(User newUser) {
+        try {
+            stmt.executeUpdate("INSERT INTO users (username, password, score, time_spent) VALUES ('" + newUser.getUsername() + "', '" + newUser.getPassword() + "', " + newUser.getScore() + ", " + newUser.getTimeSpent() + ")");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }
