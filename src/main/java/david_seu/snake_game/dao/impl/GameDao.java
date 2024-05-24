@@ -11,7 +11,6 @@ public class GameDao extends GenericDao implements IGameDao {
     @Override
     public void update(Game game) {
         try {
-            System.out.println("Updating game with id: " + game.getId());
             String sql = "UPDATE games SET SCORE = ?, snake_positions = ? WHERE id = ?";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, game.getScore());

@@ -12,11 +12,12 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
     <%
         String userJson = (String) session.getAttribute("user");
-        if (userJson == null) {
-            response.sendRedirect("");
-        }
         Gson gson = new Gson();
         User user = gson.fromJson(userJson, User.class);
+        if(user == null) {
+            response.sendRedirect("/snake_game_war_exploded/login");
+            return;
+        }
     %>
     <style>
         html,
@@ -309,7 +310,6 @@
             });
 
             // start the game
-            loop();
             updateTime();
             addGame();
             requestAnimationFrame(loop);
@@ -334,9 +334,8 @@
         user.score = maxScore;
         user.timeSpent = timeSpent;
 
-        console.log(user);
         $.ajax({
-            "url": "/snake_game_war_exploded/user",
+            "url": "/snake_game_war_exploded/user/update",
             "type": "PUT",
             "data": JSON.stringify(user),
             success: function(response) {
@@ -349,37 +348,36 @@
     }
 </script>
 <script>
-    document.getElementById('logout').addEventListener('click', function(e) {
-        e.preventDefault();
+    function logout() {
 
-        const maxScore = document.getElementById("maxscore").value;
-        const timeSpent = document.getElementById("time").value;
+            const maxScore = document.getElementById("maxscore").value;
+            const timeSpent = document.getElementById("time").value;
 
-        let user = {
-            id: "<%= user.getId() %>",
-            username: "<%= user.getUsername() %>",
-            password: "<%= user.getPassword() %>",
-            score: "<%= user.getScore() %>",
-            timeSpent: "<%= user.getTimeSpent() %>"
-        }
-
-        user.score = maxScore;
-        user.timeSpent = timeSpent;
-
-        $.ajax({
-            "url": "/snake_game_war_exploded/user",
-            "type": "PUT",
-            "data": JSON.stringify(user),
-            success: function(response) {
-                console.log("User updated successfully:", response);
-            },
-            error: function(xhr, status, error) {
-                console.error("Error updating user:", status, error);
+            let user = {
+                id: "<%= user.getId() %>",
+                username: "<%= user.getUsername() %>",
+                password: "<%= user.getPassword() %>",
+                score: "<%= user.getScore() %>",
+                timeSpent: "<%= user.getTimeSpent() %>"
             }
-        });
 
-        window.location.href = "/snake_game_war_exploded/";
-    });
+            user.score = maxScore;
+            user.timeSpent = timeSpent;
+
+            $.ajax({
+                "url": "/snake_game_war_exploded/user/logout",
+                "type": "PUT",
+                "data": JSON.stringify(user),
+                success: function(response) {
+                    console.log("User updated successfully:", response);
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error updating user:", status, error);
+                }
+            });
+
+            window.location.href = "/snake_game_war_exploded/login";
+    }
 </script>
 <body>
 <nav
@@ -388,7 +386,11 @@
 >
     <ul class="nav navbar-nav ml-auto w-100 justify-content-end">
         <li class="nav-item">
-            <a class="nav-link" id="logout" href="#">Logout</a>
+            <button
+                    class="btn btn-primary"
+                    id="logout"
+                    onclick="logout()"
+            >Logout</button>
         </li>
     </ul>
 </nav>

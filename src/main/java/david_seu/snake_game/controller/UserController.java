@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 
 import com.google.gson.Gson;
+import david_seu.snake_game.domain.Game;
 import david_seu.snake_game.domain.User;
 import david_seu.snake_game.service.IUserService;
 import david_seu.snake_game.service.impl.UserService;
@@ -18,7 +19,7 @@ import jakarta.servlet.http.HttpSession;
 
 
 @RequestScoped
-@WebServlet(name = "UserController", urlPatterns = {"/user/login", "/user/register", "/user/update"})
+@WebServlet(name = "UserController", urlPatterns = {"/user/login", "/user/register", "/user/update", "/user/logout"})
 public class UserController extends HttpServlet {
 
     private final IUserService userService;
@@ -79,10 +80,26 @@ public class UserController extends HttpServlet {
     }
 
     @Override
-    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        BufferedReader reader = request.getReader();
-        StringBuilder buffer = new StringBuilder();
+    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        System.out.println(request.getServletPath());
+        if(request.getServletPath().equals("/user/update")) {
+            updateUser(request, response);
+        } else if (request.getServletPath().equals("/user/logout")) {
+            logout(request, response);
+        }
+    }
 
+    private void logout(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        updateUser(request, response);
+        HttpSession session = request.getSession();
+        session.removeAttribute("user");
+        session.invalidate();
+    }
+
+    protected void updateUser(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+        StringBuilder buffer = new StringBuilder();
+        BufferedReader reader = request.getReader();
         String line;
         while ((line = reader.readLine()) != null) {
             buffer.append(line);
@@ -91,8 +108,11 @@ public class UserController extends HttpServlet {
 
         Gson gson = new Gson();
         User user = gson.fromJson(payload, User.class);
+
+        System.out.println("Updating user with id: " + user.getId());
+
+
         userService.updateUser(user);
-        response.setStatus(200);
     }
 
 }

@@ -4,6 +4,7 @@ import david_seu.snake_game.dao.IUserDao;
 import david_seu.snake_game.domain.User;
 import jakarta.ejb.Stateless;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -30,7 +31,16 @@ public class UserDao extends GenericDao implements IUserDao {
 
     public void update(User user) {
         try {
-            stmt.executeUpdate("UPDATE users SET score = " + user.getScore() + ", time_spent = " + user.getTimeSpent() + " WHERE id = " + user.getId());
+            String sql = "UPDATE users SET score = ?, time_spent = ? WHERE id = ?";
+            System.out.println("Updating user with id: " + user.getId());
+            System.out.println("New score: " + user.getScore());
+            System.out.println("New time spent: " + user.getTimeSpent());
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, user.getScore());
+            pstmt.setInt(2, user.getTimeSpent());
+            pstmt.setInt(3, user.getId());
+
+            pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }

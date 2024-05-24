@@ -32,7 +32,6 @@ public class GameController extends HttpServlet {
             buffer.append(line);
         }
         String payload = buffer.toString();
-        System.out.println(payload);
 
         Gson gson = new Gson();
         Game game = gson.fromJson(payload, Game.class);
